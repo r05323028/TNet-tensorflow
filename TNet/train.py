@@ -9,8 +9,8 @@ from tqdm import tqdm
 
 
 if __name__ == "__main__":
-    training_data_fname = '/home/sean/ds-sentiment-analysis/TNet/dataset/14semeval_laptop/train.txt'
-    embeddings_fname = '/home/sean/ds-sentiment-analysis/TNet/embeddings/glove.840B.300d.txt'
+    training_data_fname = 'dataset/14semeval_laptop/train.txt'
+    embeddings_fname = 'embeddings/glove.840B.300d.txt'
 
     # rm log
     os.system(

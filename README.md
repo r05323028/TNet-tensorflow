@@ -1,4 +1,4 @@
-# Transformation Network (TensorFlow)
+# Transformation Networks (TensorFlow)
 
 This repo is the implementation of Transformation Networks for Target-Oriented Sentiment Classification (Xin Li, Lidong Bing, Wai Lam, Bei Shi, 2018) which is accepted by ACL 2018.
 
