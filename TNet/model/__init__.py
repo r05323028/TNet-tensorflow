@@ -24,7 +24,7 @@ class TNet:
 
         self.bilstm_layer_bottom = BiLSTM(scope='bottom')
         self.bilstm_layer_cpt = BiLSTM(scope='cpt')
-        self.cpt_layer = CPT(mode='lf')
+        self.cpt_layer = CPT(mode='as')
         self.cnn_layer = CNN()
         self.output_layer = Projection()
         self._build_model()

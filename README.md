@@ -1,6 +1,6 @@
 # Transformation Network (TensorFlow)
 
-This repo is the implementation of Transformation Networks for Target-Oriented Sentiment Classification (Xin Li, Lidong Bing, Wai Lam, Bei Shi, 2018) which is the paper accepted by ACL 2018.
+This repo is the implementation of Transformation Networks for Target-Oriented Sentiment Classification (Xin Li, Lidong Bing, Wai Lam, Bei Shi, 2018) which is accepted by ACL 2018.
 
 But, it still has some problems and can't reach the reported results. Before training the model, you need to get embedding and dataset.
 
