@@ -1,0 +1,6 @@
+.vscode
+__pycache__
+log/train/*
+log/evaluate/*
+embeddings/*.txt
+datasets/*.txt
