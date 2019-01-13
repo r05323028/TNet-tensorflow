@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ## Train Model
 
 ```
-python -m sentiment.train
+python -m TNet.train
 ```
 
 ## Training Monitor
