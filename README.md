@@ -2,15 +2,14 @@
 
 This repo is the implementation of Transformation Networks for Target-Oriented Sentiment Classification (Xin Li, Lidong Bing, Wai Lam, Bei Shi, 2018) which is accepted by ACL 2018.
 
-However, it still has some problems and can't reach the reported results. Before training the model, you need to get the embedding and dataset.
+Before training the model, you need to get the embedding and dataset.
 
 - Glove embedding: https://nlp.stanford.edu/projects/glove/
 - Dataset: https://github.com/lixin4ever/TNet
 
-|Model|Dataset|Accuracy|
-|---|---|---|
-|Paper|LAPTOP|76.54%|
-|Our|LAPTOP|~65%|
+## Changelog
+
+- fix the performance problem (forget shuffle on each epoch.)
 
 ## Requirements
 

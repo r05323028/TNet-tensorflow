@@ -33,7 +33,6 @@ class TNet:
 
         self.merged = tf.summary.merge_all()
         self.train_writer = tf.summary.FileWriter(self.log_dir + '/train', self.sess.graph)
-        self.evaluate_writer = tf.summary.FileWriter(self.log_dir + '/evaluate', self.sess.graph)
 
         # variables initializing
         self.sess.run(tf.global_variables_initializer())
@@ -131,31 +130,6 @@ class TNet:
         # build training optimizer
         self.train_op = opt.minimize(self.loss)
 
-    def _get_train_eval_split(self, sentence_embeddings, sentence_length, target_embeddings, target_length, pw, labels, evaluation_size=None):
-        batch_size = sentence_embeddings.shape[0]
-        split_point = int(batch_size * evaluation_size)
-
-        # training
-        training_sentence_embeddings = sentence_embeddings[:split_point]
-        training_sentence_length = sentence_length[:split_point]
-        training_target_embeddings = target_embeddings[:split_point]
-        training_target_length = target_length[:split_point]
-        train_pw = pw[:split_point]
-        training_labels = labels[:split_point]
-
-        # evaluating
-        eval_sentence_embeddings = sentence_embeddings[split_point:]
-        eval_sentence_length = sentence_length[split_point:]
-        eval_target_embeddings = target_embeddings[split_point:]
-        eval_target_length = target_length[split_point:]
-        eval_pw = pw[split_point:]
-        eval_labels = labels[split_point:]
-
-        return (
-            (training_sentence_embeddings, training_sentence_length, training_target_embeddings, training_target_length, train_pw, training_labels),
-            (eval_sentence_embeddings, eval_sentence_length, eval_target_embeddings, eval_target_length, eval_pw, eval_labels),
-        )
-
     def save_model(self):
         self.saver.save(
             self.sess, 
@@ -168,90 +142,36 @@ class TNet:
             os.path.join(self.model_dir, self.model_name)
         )
 
-    def train_on_batch(self, sentence_embeddings, sentence_length, target_embeddings, target_length, pw, labels, evaluation_size=0.2):
-        if evaluation_size:
-            (training_data, evaluating_data) = self._get_train_eval_split(
-                sentence_embeddings, 
-                sentence_length, 
-                target_embeddings, 
-                target_length,
-                pw,
-                labels, 
-                evaluation_size=evaluation_size)
+    def train_on_batch(self, sentence_embeddings, sentence_length, target_embeddings, target_length, pw, labels):
+        self.sess.run(
+            self.train_op,
+            feed_dict={
+                self.word_embeddings: sentence_embeddings,
+                self.sequence_length: sentence_length,
+                self.target_embeddings: target_embeddings,
+                self.target_sequence_length: target_length,
+                self.position_weight: pw,
+                self.labels: labels,
+                self.dropout_placeholder: True
+            }
+            )
+
+        self.update_counter += 1
             
-            self.sess.run(
-                self.train_op,
-                feed_dict={
-                    self.word_embeddings: training_data[0],
-                    self.sequence_length: training_data[1],
-                    self.target_embeddings: training_data[2],
-                    self.target_sequence_length: training_data[3],
-                    self.position_weight: training_data[4],
-                    self.labels: training_data[5],
-                    self.dropout_placeholder: True
-                }
-                )
-            
-            self.update_counter += 1
+        self.training_summary = self.sess.run(
+            self.merged,
+            feed_dict={
+                self.word_embeddings: sentence_embeddings,
+                self.sequence_length: sentence_length,
+                self.target_embeddings: target_embeddings,
+                self.target_sequence_length: target_length,
+                self.position_weight: pw,
+                self.labels: labels,
+                self.dropout_placeholder: True
+            }
+        )
 
-            self.training_summary = self.sess.run(
-                self.merged,
-                feed_dict={
-                    self.word_embeddings: training_data[0],
-                    self.sequence_length: training_data[1],
-                    self.target_embeddings: training_data[2],
-                    self.target_sequence_length: training_data[3],
-                    self.position_weight: training_data[4],
-                    self.labels: training_data[5],
-                    self.dropout_placeholder: True
-                }
-            )
-            self.evaluating_summary = self.sess.run(
-                self.merged,
-                feed_dict={
-                    self.word_embeddings: evaluating_data[0],
-                    self.sequence_length: evaluating_data[1],
-                    self.target_embeddings: evaluating_data[2],
-                    self.target_sequence_length: evaluating_data[3],
-                    self.position_weight: evaluating_data[4],
-                    self.labels: evaluating_data[5],
-                    self.dropout_placeholder: False
-                }
-            )
-
-            self.train_writer.add_summary(self.training_summary, self.update_counter)
-            self.evaluate_writer.add_summary(self.evaluating_summary, self.update_counter)
-        
-        else:
-            self.sess.run(
-                self.train_op,
-                feed_dict={
-                    self.word_embeddings: sentence_embeddings,
-                    self.sequence_length: sentence_length,
-                    self.target_embeddings: target_embeddings,
-                    self.target_sequence_length: target_length,
-                    self.position_weight: pw,
-                    self.labels: labels,
-                    self.dropout_placeholder: True
-                }
-                )
-
-            self.update_counter += 1
-                
-            self.training_summary = self.sess.run(
-                self.merged,
-                feed_dict={
-                    self.word_embeddings: sentence_embeddings,
-                    self.sequence_length: sentence_length,
-                    self.target_embeddings: target_embeddings,
-                    self.target_sequence_length: target_length,
-                    self.position_weight: pw,
-                    self.labels: labels,
-                    self.dropout_placeholder: True
-                }
-            )
-
-            self.train_writer.add_summary(self.training_summary, self.update_counter)
+        self.train_writer.add_summary(self.training_summary, self.update_counter)
 
     def predict_on_batch(self, sentence_embeddings, sentence_length, target_embeddings, target_length, pw):
         max_idx = tf.argmax(self.logits, axis=1)

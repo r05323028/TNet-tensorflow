@@ -20,18 +20,18 @@ if __name__ == "__main__":
 
     # load data
     embeddings = Glove(embeddings_fname)
-    batch_generator = Batch(training_data_fname)
+    batch_generator = Batch(training_data_fname, shuffle=True)
     test_batch_generator = Batch(testing_data_fname)
 
     model = TNet()
-    highest_acc = 0
     epoch = tqdm(range(0, 100), desc='epoch')
+    highest_acc = 0
 
     for _ in epoch:
         acc_list = []
+
         for batch in batch_generator():
             feed_batch = get_normalized_batch(batch, embeddings)
-
             model.train_on_batch(**feed_batch)
 
         for batch in test_batch_generator():

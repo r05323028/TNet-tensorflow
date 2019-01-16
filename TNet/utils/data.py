@@ -4,9 +4,10 @@ import random
 
 class Batch:
 
-    def __init__(self, fname, batch_size=64):
+    def __init__(self, fname, batch_size=64, shuffle=False):
         self.fname = fname
         self.batch_size = batch_size
+        self.shuffle = shuffle
 
         # patterns
         self.sentiment_tag = re.compile(
@@ -28,7 +29,7 @@ class Batch:
             file.close()
 
     def _get_pw(self, k, m, i, n):
-        C = 40.0
+        C = 30.0
         k += 1
         i += 1
         
