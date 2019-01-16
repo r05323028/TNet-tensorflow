@@ -10,9 +10,14 @@ But, it still has some problems and can't reach the reported results. Before tra
 |Model|Dataset|Accuracy|
 |---|---|---|
 |Paper|LAPTOP|76.54%|
-|tensorflow|LAPTOP|~65%|
+|Our|LAPTOP|~65%|
 
 ## Requirements
+
+- Python 3.6.x
+- tensorflow 1.12.0
+- numpy 1.15.3
+- tqdm 4.23.4
 
 ```
 pip install -r requirements.txt
