@@ -19,7 +19,6 @@ class TNet:
         self.log_dir = config['basic']['log_dir']
         self.dropout_rate = 0.3
         self.lr = 0.002
-        self.l2_lambda = 0.0002
         self.update_counter = 0
 
         self.bilstm_layer_bottom = BiLSTM(scope='bottom')
@@ -120,10 +119,6 @@ class TNet:
             onehot_labels=self.labels,
             logits=self.logits
         )
-
-        # l2_loss = self.l2_lambda * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables() if not "Bias" in tf_var.name)
-
-        # self.loss += l2_loss
 
         # accuracy
         self.acc = tf.reduce_mean(tf.cast(
@@ -238,7 +233,6 @@ class TNet:
                     self.position_weight: pw,
                     self.labels: labels,
                     self.dropout_placeholder: True
-
                 }
                 )
 
@@ -275,3 +269,19 @@ class TNet:
         )
 
         return pred
+
+    def test_acc(self, sentence_embeddings, sentence_length, target_embeddings, target_length, pw, labels):
+        acc = self.sess.run(
+            self.acc,
+            feed_dict={
+                self.word_embeddings: sentence_embeddings,
+                self.sequence_length: sentence_length,
+                self.target_embeddings: target_embeddings,
+                self.target_sequence_length: target_length,
+                self.position_weight: pw,
+                self.labels: labels,
+                self.dropout_placeholder: False
+            }
+        )
+
+        return acc
