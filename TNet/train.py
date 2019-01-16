@@ -42,4 +42,4 @@ if __name__ == "__main__":
         if np.mean(acc_list) > highest_acc:
             model.save_model()
             highest_acc = np.mean(acc_list)
-            epoch.set_description('highest acc: {acc:.3f}'.format(acc=highest_acc))
+            epoch.set_description('highest test acc: {acc:.3f}'.format(acc=highest_acc))
