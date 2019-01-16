@@ -17,6 +17,8 @@ class Batch:
         self._read_data()
 
     def __call__(self):
+        if self.shuffle:
+            random.shuffle(self._data)
         for batch in self._make_batch():
             yield batch
 
@@ -25,7 +27,6 @@ class Batch:
             self._data = [
                 sentence.strip() for sentence in file.readlines()
                 ]
-            random.shuffle(self._data)
             file.close()
 
     def _get_pw(self, k, m, i, n):
