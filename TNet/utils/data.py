@@ -4,9 +4,10 @@ import random
 
 class Batch:
 
-    def __init__(self, fname, batch_size=64, shuffle=False):
+    def __init__(self, fname, hparams, mode, shuffle=False):
         self.fname = fname
-        self.batch_size = batch_size
+        self.batch_size = int(hparams['global']['batch_size'])
+        self.C = float(hparams[mode]['C'])
         self.shuffle = shuffle
 
         # patterns
@@ -30,7 +31,6 @@ class Batch:
             file.close()
 
     def _get_pw(self, k, m, i, n):
-        C = 30.0
         k += 1
         i += 1
         
@@ -38,10 +38,10 @@ class Batch:
             pw = 1
         
         elif i < (k + m):
-            pw = 1 - ((k + m - i) / C)
+            pw = 1 - ((k + m - i) / self.C)
 
         elif (k + m) <= i and i <= n:
-            pw = 1 - ((i - k) / C)
+            pw = 1 - ((i - k) / self.C)
         
         else:
             pw = 0

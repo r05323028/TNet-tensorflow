@@ -3,9 +3,9 @@ import tensorflow as tf
 
 class Projection:
     
-    def __init__(self, filter_nums=50, output_nums=3):
-        self.filter_nums = filter_nums
-        self.output_nums = output_nums
+    def __init__(self, hparams, mode):
+        self.filter_nums = int(hparams[mode]['num_feature_maps'])
+        self.output_nums = 3
 
         with tf.variable_scope('Softmax'):
             self.weights = {

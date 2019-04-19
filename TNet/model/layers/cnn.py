@@ -4,12 +4,11 @@ import numpy as np
 
 class CNN:
 
-    def __init__(self, hidden_nums=50, filter_nums=50):
-        self.hidden_nums = hidden_nums
+    def __init__(self, hparams, mode='as'):
+        self.hidden_nums = int(hparams['global']['hidden_size'])
 
-        # parameters
-        self.kernel_size = 3
-        self.filter_nums = filter_nums
+        self.kernel_size = int(hparams['global']['s'])
+        self.filter_nums = int(hparams[mode]['num_feature_maps'])
 
         with tf.variable_scope('CNN_Variables', reuse=tf.AUTO_REUSE):
             self.W = tf.get_variable(

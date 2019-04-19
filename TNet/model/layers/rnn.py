@@ -4,9 +4,9 @@ import tensorflow as tf
 
 class BiLSTM:
 
-    def __init__(self, scope, hidden_nums=50):
+    def __init__(self, hparams, scope):
         self.scope = scope
-        self.hidden_nums = hidden_nums
+        self.hidden_nums = int(hparams['global']['hidden_size'])
 
     def __call__(self, hs, seq_len):
         with tf.variable_scope('LSTM_Variables_%s' % self.scope, reuse=tf.AUTO_REUSE):

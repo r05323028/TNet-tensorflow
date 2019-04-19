@@ -6,9 +6,9 @@ from TNet.utils.nn import hard_sigmoid
 
 class CPT:
 
-    def __init__(self, hidden_nums=50, mode='as'):
+    def __init__(self, hparams, mode='as'):
         self.mode = mode
-        self.hidden_nums = hidden_nums
+        self.hidden_nums = int(hparams['global']['hidden_size'])
 
         with tf.variable_scope('TST_Variables', reuse=tf.AUTO_REUSE):
             self.weights = {

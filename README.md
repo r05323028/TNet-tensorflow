@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ## Train Model
 
 ```
-python -m TNet.train
+python train.py
 ```
 
 ## Training Monitor

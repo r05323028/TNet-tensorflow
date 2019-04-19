@@ -11,21 +11,20 @@ from TNet.model.layers.output import Projection
 
 class TNet:
     
-    def __init__(self):
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        config.read('config.ini')
-        self.model_name = config['basic']['model_name']
+    def __init__(self, hparams, *args, **kwargs):
+        self.model_name = kwargs.get('model_name')
         self.model_dir = 'models'
-        self.log_dir = config['basic']['log_dir']
-        self.dropout_rate = 0.3
-        self.lr = 0.002
+        self.log_dir = 'logs'
+        self.dropout_rate = float(hparams['global']['dropout_rate'])
+        self.lr = float(hparams['global']['learning_rate'])
+        self.mode = kwargs.get('mode')
         self.update_counter = 0
 
-        self.bilstm_layer_bottom = BiLSTM(scope='bottom')
-        self.bilstm_layer_cpt = BiLSTM(scope='cpt')
-        self.cpt_layer = CPT(mode='as')
-        self.cnn_layer = CNN()
-        self.output_layer = Projection()
+        self.bilstm_layer_bottom = BiLSTM(hparams, scope='bottom')
+        self.bilstm_layer_cpt = BiLSTM(hparams,scope='cpt')
+        self.cpt_layer = CPT(hparams, mode=self.mode)
+        self.cnn_layer = CNN(hparams)
+        self.output_layer = Projection(hparams, mode=self.mode)
         self._build_model()
 
         self.sess = tf.Session()
@@ -54,28 +53,28 @@ class TNet:
         self.target_sequence_length = tf.placeholder(tf.int32, shape=[None])
         self.position_weight = tf.placeholder(tf.float32, shape=[None, None])
         self.labels = tf.placeholder(tf.int32, shape=[None, 3])
-        self.dropout_placeholder = tf.placeholder(tf.bool)
+        self.is_training = tf.placeholder(tf.bool)
 
         opt = tf.train.AdamOptimizer(learning_rate=self.lr)
 
         # layers
         
         # dropout word embeddings
-        self.word_embeddings = tf.layers.dropout(self.word_embeddings, rate=self.dropout_rate, training=self.dropout_placeholder)
-        self.target_embeddings = tf.layers.dropout(self.target_embeddings, rate=self.dropout_rate, training=self.dropout_placeholder)
+        self.word_embeddings = tf.layers.dropout(self.word_embeddings, rate=self.dropout_rate, training=self.is_training)
+        self.target_embeddings = tf.layers.dropout(self.target_embeddings, rate=self.dropout_rate, training=self.is_training)
 
         # (batch_size, target_sequence_length, 2*hidden_nums)        
         target_hidden_states = self.bilstm_layer_cpt(
             self.target_embeddings,
             self.target_sequence_length
-            ) 
+        ) 
         
         # BiLSTM
         # (?, ?, 2 * hidden_nums)
         hidden_states = self.bilstm_layer_bottom(
             self.word_embeddings,
             self.sequence_length
-            ) 
+        ) 
 
         # CPT 1
         # (batch_size, max_sequence_length, 2*hidden_nums)
@@ -88,7 +87,7 @@ class TNet:
         self.tailor_made_hidden_states_1 = self._position_embedding(
             self.tailor_made_hidden_states_1, 
             self.position_weight
-            )
+        )
 
         # CPT 2
         # (batch_size, max_sequence_length, 2*hidden_nums)
@@ -101,14 +100,14 @@ class TNet:
         self.tailor_made_hidden_states_2 = self._position_embedding(
             self.tailor_made_hidden_states_2, 
             self.position_weight
-            )
+        )
 
         # CNN feature extractor
         # (batch_size, filter_nums)
         self.convolved_hidden_states, self.feature_maps = self.cnn_layer(self.tailor_made_hidden_states_2)
 
         # dropout word representation
-        self.convolved_hidden_states = tf.layers.dropout(self.convolved_hidden_states, rate=self.dropout_rate, training=self.dropout_placeholder)
+        self.convolved_hidden_states = tf.layers.dropout(self.convolved_hidden_states, rate=self.dropout_rate, training=self.is_training)
 
         # (batch_size, output_nums)
         self.logits = self.output_layer(self.convolved_hidden_states)
@@ -134,7 +133,7 @@ class TNet:
         self.saver.save(
             self.sess, 
             os.path.join(self.model_dir, self.model_name)
-            )
+        )
 
     def load_model(self):
         self.saver.restore(
@@ -152,9 +151,9 @@ class TNet:
                 self.target_sequence_length: target_length,
                 self.position_weight: pw,
                 self.labels: labels,
-                self.dropout_placeholder: True
+                self.is_training: True
             }
-            )
+        )
 
         self.update_counter += 1
             
@@ -167,7 +166,7 @@ class TNet:
                 self.target_sequence_length: target_length,
                 self.position_weight: pw,
                 self.labels: labels,
-                self.dropout_placeholder: True
+                self.is_training: True
             }
         )
 
@@ -184,7 +183,7 @@ class TNet:
                 self.target_embeddings: target_embeddings,
                 self.target_sequence_length: target_length,
                 self.position_weight: pw,
-                self.dropout_placeholder: False
+                self.is_training: False
             }
         )
 
@@ -200,7 +199,7 @@ class TNet:
                 self.target_sequence_length: target_length,
                 self.position_weight: pw,
                 self.labels: labels,
-                self.dropout_placeholder: False
+                self.is_training: False
             }
         )
 
