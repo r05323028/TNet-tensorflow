@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import tensorflow as tf
-from configparser import ConfigParser, ExtendedInterpolation
 
 from TNet.model.layers.rnn import BiLSTM
 from TNet.model.layers.cpt import CPT
@@ -21,7 +20,7 @@ class TNet:
         self.update_counter = 0
 
         self.bilstm_layer_bottom = BiLSTM(hparams, scope='bottom')
-        self.bilstm_layer_cpt = BiLSTM(hparams,scope='cpt')
+        self.bilstm_layer_cpt = BiLSTM(hparams, scope='cpt')
         self.cpt_layer = CPT(hparams, mode=self.mode)
         self.cnn_layer = CNN(hparams)
         self.output_layer = Projection(hparams, mode=self.mode)
