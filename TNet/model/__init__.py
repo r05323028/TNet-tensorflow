@@ -14,9 +14,12 @@ class TNet:
         self.model_name = kwargs.get('model_name')
         self.model_dir = 'models'
         self.log_dir = 'logs'
+
         self.dropout_rate = float(hparams['global']['dropout_rate'])
         self.lr = float(hparams['global']['learning_rate'])
+        self.embedding_size = int(hparams['global']['embedding_size'])
         self.mode = kwargs.get('mode')
+        
         self.update_counter = 0
 
         self.bilstm_layer_bottom = BiLSTM(hparams, scope='bottom')
@@ -46,9 +49,9 @@ class TNet:
 
     def _build_model(self):       
         # placeholder
-        self.word_embeddings = tf.placeholder(tf.float32, shape=[None, None, 300])
+        self.word_embeddings = tf.placeholder(tf.float32, shape=[None, None, self.embedding_size])
         self.sequence_length = tf.placeholder(tf.int32, shape=[None])
-        self.target_embeddings = tf.placeholder(tf.float32, shape=[None, None, 300])
+        self.target_embeddings = tf.placeholder(tf.float32, shape=[None, None, self.embedding_size])
         self.target_sequence_length = tf.placeholder(tf.int32, shape=[None])
         self.position_weight = tf.placeholder(tf.float32, shape=[None, None])
         self.labels = tf.placeholder(tf.int32, shape=[None, 3])
