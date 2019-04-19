@@ -4,11 +4,18 @@ This repo is the implementation of Transformation Networks for Target-Oriented S
 
 Before training the model, you need to get the embedding and dataset.
 
-- Glove embedding: https://nlp.stanford.edu/projects/glove/
+- Glove embedding: https://nlp.stanford.edu/projects/glove/ (glove.840B.300d)
 - Dataset: https://github.com/lixin4ever/TNet
+
+or you can use `prepare_data.sh` to download the laptop dataset and the embedding automately.
+
+```
+. ./prepare_data.sh
+```
 
 ## Changelog
 
+- add the `prepare_data.sh` script.
 - fix the performance problem (forget shuffle on each epoch.)
 
 ## Requirements
